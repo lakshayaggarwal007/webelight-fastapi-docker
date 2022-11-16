@@ -22,14 +22,14 @@ def db():
 
 
 
-@app.post('/device/info')
+@app.post('/device/info',tags=['Device_Info'])
 def save_device_info(info: DeviceInfo, db=Depends(db)):
     object_in_db = crud.get_device_info(db, info.token)
     if object_in_db:
         raise HTTPException(400, detail= crud.error_message('This device info already exists'))
     return crud.save_device_info(db,info)
 
-@app.get('/device/info/{token}')
+@app.get('/device/info/{token}',tags=['Device_Info'])
 def get_device_info(token: str, db=Depends(db)):
     info = crud.get_device_info(db,token)
     if info:
@@ -37,17 +37,17 @@ def get_device_info(token: str, db=Depends(db)):
     else:
         raise HTTPException(404, crud.error_message('No device found for token {}'.format(token)))
 
-@app.get('/device/info')
+@app.get('/device/info',tags=['Device_Info'])
 def get_all_device_info(db=Depends(db)):
     return crud.get_device_info(db)
 
-@app.post('/configuration')
+@app.post('/configuration',tags=['Device_Info'])
 def save_configuration(config: Configuration, db=Depends(db)):
     # always maintain one config
     crud.delete_nudges_configuration(db)
     return crud.save_nudges_configuration(db, config)
 
-@app.get('/configuration')
+@app.get('/configuration',tags=['Device_Info'])
 def get_configuration(db=Depends(db)):
     config = crud.get_nudges_configuration(db)
     if config:
