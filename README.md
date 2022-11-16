@@ -1,1 +1,5 @@
-# webelight-fastapi-docker
+
+#in root dir run
+
+docker-compose up --build
+ 
