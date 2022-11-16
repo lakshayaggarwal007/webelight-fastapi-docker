@@ -62,15 +62,31 @@ def get_configuration(db=Depends(db)):
     
 
     
+
+@app.post('/user',response_model=schemas.ShowUser,tags=['Users'])
+def create_user(request:schemas.User, db:Session = Depends(get_db)):
+    0
+    new_user = models.User(name=request.name,email=request.email,password=Hash.bcrypt(request.password))
+   
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+
+
+@app.get('/user/{id}',status_code=status.HTTP_200_OK,response_model=schemas.ShowUser,tags=['Users'])
+def get_user(id:int,db:Session = Depends(get_db)):
+    User = db.query(models.User).filter(models.User.id==id).first()
+    if not User:
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with the id {id} not available")
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return{'details':f'blog with the id {id} not available'}
+    return User
+
     
-    
-@app.get('/blog',response_model=List[schemas.showBlog],tags=['Blogs'])
-def all(db = Depends(get_db)):
-    blogs = db.query(models.Blog).all()
-    return blogs
-
-
-
 @app.post('/blog',status_code=status.HTTP_201_CREATED,tags=['Blogs'])
 def create(blog: schemas.Blog ,db = Depends(get_db)):
     new_blog = models.Blog(title=blog.title,body =blog.body,user_id =blog.user_id) 
@@ -78,6 +94,15 @@ def create(blog: schemas.Blog ,db = Depends(get_db)):
     db.commit()
     db.refresh(new_blog)
     return new_blog
+
+
+@app.get('/blog',response_model=List[schemas.showBlog],tags=['Blogs'])
+def all(db = Depends(get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+
+
 
 @app.get('/blog/{id}',status_code=status.HTTP_200_OK,response_model=schemas.showBlog,tags=['Blogs'])
 def show(id,response : Response ,db = Depends(get_db)):
@@ -111,26 +136,3 @@ def update(id,request: schemas.Blog , db = Depends(get_db)):
     return 'updated'
     
     
-
-@app.post('/user',response_model=schemas.ShowUser,tags=['Users'])
-def create_user(request:schemas.User, db:Session = Depends(get_db)):
-    0
-    new_user = models.User(name=request.name,email=request.email,password=Hash.bcrypt(request.password))
-   
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-
-
-
-
-@app.get('/user/{id}',status_code=status.HTTP_200_OK,response_model=schemas.ShowUser,tags=['Users'])
-def get_user(id:int,db:Session = Depends(get_db)):
-    User = db.query(models.User).filter(models.User.id==id).first()
-    if not User:
-
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with the id {id} not available")
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return{'details':f'blog with the id {id} not available'}
-    return User
