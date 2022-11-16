@@ -20,12 +20,7 @@ def db():
         db.close()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 @app.post('/device/info')
 def save_device_info(info: DeviceInfo, db=Depends(db)):
@@ -60,7 +55,12 @@ def get_configuration(db=Depends(db)):
     else:
         raise HTTPException(404, crud.error_message('No configuration set'))
     
-
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
     
 
 @app.post('/user',response_model=schemas.ShowUser,tags=['Users'])
